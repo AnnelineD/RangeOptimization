@@ -25,6 +25,12 @@ def to_number(p: list[int], b) -> int:
     return sum((b**i)*e for i, e in enumerate(reversed(p)))
 
 
+def to_number_special(p: list[int], o: int, base) -> int:
+  # BASE = 10 => to_number_special([3, 2, 15], 1) = 3215
+  # BASE = 10 => to_number_special([3, 2, 15], 2) = 32015
+  return p[-1] + sum((base**(i + o + 1))*e for i, e in enumerate(reversed(p[:-1])))
+
+
 def order(n, b):
   return len(numberToBase(n, b)) - 1
 

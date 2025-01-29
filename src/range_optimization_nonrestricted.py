@@ -7,10 +7,10 @@ Original file is located at
     https://colab.research.google.com/drive/19iuMpPz9PdFVWMzWta6mt8HR_f8XybUu
 """
 
-from itertools import groupby, repeat, cycle, accumulate, takewhile, islice
+from itertools import repeat, cycle, islice
 from math import gcd
 
-from src.base_calc import numberToBase, order, to_number, to_size
+from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
 from src.node import Node
 from src.pattern import minimal_seq, pattern_ext, repetition_ext
 from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group
@@ -262,14 +262,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   return lvs[-1][0], l
 
 
-
-def to_number_special(p: list[int], o: int, base) -> int:
-  # BASE = 10 => to_number_special([3, 2, 15], 1) = 3215
-  # BASE = 10 => to_number_special([3, 2, 15], 2) = 32015
-  return p[-1] + sum((base**(i + o + 1))*e for i, e in enumerate(reversed(p[:-1])))
-
-
-
 def print_graph(l):
   print("digraph G { \n ranksep=3")
   for n in l: n.graphviz()
@@ -279,16 +271,7 @@ def print_graph(l):
 
 if __name__ == '__main__':
   base = 2
-  # good edge cases (1002, 3), (2130, 3), (5201, 3)
-  # good start cases: dangly edges: (3, 301, 199), (3, 4125, 4129), (3, 199, 321)
-  # (827, 2977, 8)
-  # (121, 1165, 3)
-  # (841, 1275, 7)
-  # start, stop, step = (37, 137, 20)  # BASE 16
-  # start, stop, step = (94, 2000, 8)
-  # start, stop, step = (100000, 292815, 80)
   start, stop, step = (94210, 94283, 24)
-  start, stop, step = (0, 1, 24)
 
 
   rn, l = crange(start, stop, step, base)

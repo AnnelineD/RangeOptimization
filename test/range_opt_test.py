@@ -27,7 +27,7 @@ class HandpickedTests(unittest.TestCase):
         self.assertListEqual([], compare_ranges(tests))
 
     def test_size_intermediate_layers_edge_case(self):
-        tests = [(0, 292815, 8, 10)]   # edge case for size intermediate layers!
+        tests = [(0, 292815, 8, 10), (94, 2000, 8, 10)]   # edge case for size intermediate layers!
 
         self.assertListEqual([], compare_ranges(tests))
 
@@ -55,10 +55,18 @@ class HandpickedTests(unittest.TestCase):
             (47, 200, 15, 10),
             (101, 229, 66, 10),
             (121, 1165, 3, 10),
-            (94210, 94283, 24, 2)   # start_group reset
+            (94210, 94283, 24, 2),   # start_group reset
+            (100000, 292815, 80)
         ]
 
         self.assertListEqual([], compare_ranges(tests))
+
+    def test_cases_of_previous_algorithm(self):
+        tests = [(0, 1002, 3, 10), (0, 2130, 3, 10), (0, 5201, 3, 10)]
+        dangly_edges = [(199, 301, 3, 10), (4125, 4129, 3, 10), (199, 321, 3, 10)]
+        tests2 = [(827, 2977, 8, 10), (121, 1165, 3, 10), (841, 1275, 7, 10)]
+
+        self.assertListEqual([], compare_ranges(tests + dangly_edges + tests2))
 
     def test_separate_nodes_cases(self):
         """Seperate start/stop examples
