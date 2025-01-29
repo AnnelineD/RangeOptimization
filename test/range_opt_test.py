@@ -6,6 +6,7 @@ from src.range_optimization_nonrestricted import crange, to_number_special
 
 
 def compare_range(start, stop, step, base) -> bool:
+    print(start, stop, step, base)
     rn, l = crange(start, stop, step, base)
 
     wanted_range = list(range(start, stop, step))
@@ -30,6 +31,13 @@ class HandpickedTests(unittest.TestCase):
 
         self.assertListEqual([], compare_ranges(tests))
 
+    def test_root_is_one_path(self):
+        tests = [(11111, 11112, 3, 10),
+                 (123222, 123589, 20, 10),
+                 (9999095, 9999995, 15, 20)]
+
+        self.assertListEqual([], compare_ranges(tests))
+
     def test_minimal_sequence(self):
         tests = [(1087, 9000, 87, 10),  # minimal_seq(r1)
                  (1087, 9000, 15, 10)]
@@ -47,6 +55,7 @@ class HandpickedTests(unittest.TestCase):
             (47, 200, 15, 10),
             (101, 229, 66, 10),
             (121, 1165, 3, 10),
+            (94210, 94283, 24, 2)   # start_group reset
         ]
 
         self.assertListEqual([], compare_ranges(tests))
@@ -72,7 +81,6 @@ class HandpickedTests(unittest.TestCase):
         test_all_cases = [(88, 2186, 15, 10),
                           (88, 2100, 15, 10),
                           (88, 9990, 15, 10),
-
                           (10, 2186, 15, 10),
                           (10, 9990, 15, 10),
                           (312, 9990, 15, 10),
@@ -84,13 +92,13 @@ class HandpickedTests(unittest.TestCase):
         self.assertListEqual([], compare_ranges(test_all_cases))
 
 
-class AutomaticTestCase(unittest.TestCase):
+class GeneratedTestCases(unittest.TestCase):
     def param_generator(self, base = None):
         if not base:
-            base = randint(1, 200)
+            base = randint(2, 200)
 
         step = randint(1, 99)
-        start = randint(0, 100)
+        start = randint(0, 100000)
         stop = randint(start, 300000)
 
         return start, stop, step, base

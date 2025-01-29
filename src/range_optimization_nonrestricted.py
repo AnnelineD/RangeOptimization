@@ -7,9 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/19iuMpPz9PdFVWMzWta6mt8HR_f8XybUu
 """
 
-import itertools
-
-from pprint import pprint
 from itertools import groupby, repeat, cycle, accumulate, takewhile, islice
 from math import gcd
 
@@ -26,12 +23,12 @@ def nth(it, n):
     return x
 
 
-def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
+def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node]]:
   BASE = base
+  assert base > 1
   assert step > 0
   assert start >= 0
   assert start <= stop
-  # assert step < stop
 
   if stop == start:
     return # TODO empty graph??
@@ -65,25 +62,21 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   offset = start%step
 
   std_nodes = int(step/gcd(BASE**(order(step, base) + 1), step))
-  print("std nodes", std_nodes)
-
-
-  # stop_split = numberToBase(stop)
-
+  # print("std nodes", std_nodes)
 
   start_split_, last_number_split_, to_add = strip_equal_start(start_split, last_number_split)
 
 
 
-  print("last number", last_number)
+  # print("last number", last_number)
   print(last_number_split)
-  print(start_split)
+  print(start, start_split)
 
-  print("to add", to_add)
+  # print("to add", to_add)
 
   # calculate the number of nodes in each layer, which is not the lowest or highest layer
   size_intermediate_layers = number_of_nodes_per_layer(start_split_, last_number_split_, step, base)
-  print("size_intermediate_layers", size_intermediate_layers)
+  # print("size_intermediate_layers", size_intermediate_layers)
 
 
 
@@ -96,8 +89,8 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   pat_stop_idx = pat.index(to_number(last_number_split[-(order(step, base) + 1):], base))
 
   print("pattern", pat)
-  print("first idx", pat_start_idx)
-  print("stop idx", pat_stop_idx)
+  # print("first idx", pat_start_idx)
+  # print("stop idx", pat_stop_idx)
 
   r1 = repetition_ext(step, offset, base)
     # compress r1 only if pattern is also compressed
@@ -108,8 +101,8 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
 
   assert pat_start_idx <= sum(r1_)
 
-  print("r1", r1)
-  print("r1_", r1_)
+  # print("r1", r1)
+  # print("r1_", r1_)
 
 
   start_group, start_idx = find_group(pat, r1_, to_number(start_split_[-(order(step, base) + 1):], base))
@@ -119,11 +112,11 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   separate_stop_group = (stop_idx != (r1_[stop_group] - 1))
 
   print("(start group, start index)", (start_group, start_idx))
-  print("(stop group, stop index)", (stop_group, stop_idx))
+  # print("(stop group, stop index)", (stop_group, stop_idx))
 
 
-  print("separate start", separate_start_group)
-  print("separate stop", separate_stop_group)
+  # print("separate start", separate_start_group)
+  # print("separate stop", separate_stop_group)
 
 
 
@@ -148,23 +141,20 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   lvs = [lv1]
 
   # extra start node
-  lv1_start_node = None
   curr_start_node = None
   curr_start_idx = - (order(step, base) + 2)
 
   if separate_start_group:
     last_idx_start_group = pat_start_idx + r1_[start_group] - (start_idx + 1)
-    print("last_idx_start_group", last_idx_start_group)
+    # print("last_idx_start_group", last_idx_start_group)
 
     lv1_start_node = Node(dict(zip(pat[pat_start_idx:last_idx_start_group + 1], repeat(()))), l)
-    print("start lvl", lv1_start_node.cd)
+    # print("start lvl", lv1_start_node.cd)
 
     curr_start_node = lv1_start_node
 
   # extra stop node
-  lv1_stop_node = None
   curr_stop_node = None
-  curr_stop_idx = - (order(step, base) + 2)
 
   if separate_stop_group:
     first_idx_stop_group = pat_stop_idx - stop_idx
@@ -183,14 +173,6 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
 
   size_intermediate_layers.reverse()
   next_start_group = (start_group + 1)%len(r1_)
-  # print("next_start_group", next_start_group)
-  # print("problem point", last_number_split_, curr_start_idx)
-  # stop_groups_to_skip = (stop_group - last_number_split_[curr_start_idx])%len(r1_)
-
-
-  # first_zero_goes_to_ = start_group
-
-  # print("stop group to skip", stop_groups_to_skip)
 
   std_nodes_ = len(r1_)
   eq_stop_node = stop_group
@@ -198,10 +180,9 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   for i, nns in enumerate(size_intermediate_layers):
 
     print("LAYER", i)
-    print("eq stop node", eq_stop_node)
 
     print(separate_start_group, separate_stop_group)
-    print("stop group", stop_group)
+    # print("stop group", stop_group)
     # print("stop_groups_to_skip", stop_groups_to_skip)
 
     lv_curr = []
@@ -209,28 +190,14 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
     # lv_stop = []
 
 
-    print("prev nodes", [l.idc for l in lv_prev])
+    # print("prev nodes", [l.idc for l in lv_prev])
 
-
-    # print("calculate t:", stop_group, last_number_split_[curr_start_idx], std_nodes_)
-    # t = (stop_group - last_number_split_[curr_start_idx]) % std_nodes_
-
-    # print("t", t)
-    # stop_groups_to_skip = t
-    # stop_groups_to_skip = (s - e) % std_nodes_
     stop_groups_to_skip = (eq_stop_node - last_number_split_[curr_start_idx]) % std_nodes_
-    # print(s, e, a, std_nodes_)
 
     if separate_start_group:  #checked
       lv_prev_it = iter(cycle(lv_prev))
       list(islice(lv_prev_it, next_start_group))
-      # skipped += next_start_group
-
-      # first_zero_goes_to = next_start_group
-      # print("first_zero_goes_to", first_zero_goes_to)
-
       v = [curr_start_node] + list(islice(lv_prev_it, BASE - start_split_[curr_start_idx] - 1))
-      # skipped += BASE - start_split_[curr_start_idx] - 1
 
       next_start_node = Node(dict(zip(range(start_split_[curr_start_idx], BASE), v)), l)
       # print("next start node", next_start_node, next_start_node.cd)
@@ -249,22 +216,18 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
         # print("CASE start_split[curr_start_idx] > 0")
         lv_prev_it = iter(cycle(lv_prev))
         list(islice(lv_prev_it, start_group))
-
-        # skipped += start_group
-
         separate_start_group = True
         curr_start_node = Node(dict(zip(range(start_split_[curr_start_idx], BASE), islice(lv_prev_it, (BASE - start_split_[curr_start_idx])))), l)
-        # skipped += (BASE - start_split_[curr_start_idx])
+
         #  print("current start node", curr_start_node, curr_start_node.cd)
 
 
       else:
-        # print("CASE start_split[curr_start_idx] == 0")
+        print("CASE start_split[curr_start_idx] == 0")
         # print("curr_start", start_split_[curr_start_idx])
+        print("I will skip", start_group)
         lv_prev_it = iter(cycle(lv_prev))
         list(islice(lv_prev_it, start_group))   # ???
-        # skipped += start_group
-
 
 
 
@@ -275,7 +238,6 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
     for n in range(nns):
       d = dict(zip(range(BASE), peek_node + list(islice(lv_prev_it, BASE - 1))))
       if d[last_number_split_[curr_start_idx]] == lv_prev[eq_stop_node]:
-        print("YAYAYAA", n)
         next_eq_stop_node = n
       lv_curr.append(Node(d, l))
 
@@ -286,14 +248,9 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
 
 
     if next_eq_stop_node is None:
-      print("OHHHW NOOO")
-      print("n", n)
-      print(lv_prev[eq_stop_node])
-      print(lv_curr)
-
-      return lvs[-1][0], l
-
-
+      # This should never occur
+      raise NotImplementedError
+      pass
 
 
     if separate_stop_group: #checked
@@ -313,12 +270,9 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
         # print("case last_number_split[curr_start_idx] < BASE - 1")
         lv_prev_it_stop = iter(cycle(lv_prev))
 
-
-        # if stop_groups_to_skip > 0:
         list(islice(lv_prev_it_stop, stop_groups_to_skip))
 
         separate_stop_group = True
-        # next_group = 0
         curr_stop_node = Node(dict(zip(range(0, last_number_split_[curr_start_idx] + 1), islice(lv_prev_it_stop, last_number_split_[curr_start_idx] + 1))), l)
         # print("curr stop node", curr_stop_node, curr_stop_node.cd)
 
@@ -332,10 +286,7 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
     next_start_group = 0
     std_nodes_ = std_nodes
     eq_stop_node = next_eq_stop_node
-
-
-
-
+    start_group = 0
 
 
   print("end", separate_start_group, separate_stop_group)
@@ -350,7 +301,7 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
     d = [curr_start_node] + list(islice(lv_prev_it, BASE))
 
     list(islice(lv_prev_it, 1))
-    print("last nr", last_number_split_[0])
+    # print("last nr", last_number_split_[0])
 
     lv_top.append(Node(dict(zip(range(start_split_[0], last_number_split_[0] + 1), d)), l))
 
@@ -359,7 +310,7 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
     number_normal = last_number_split_[0] - start_split_[0] - 1
 
     # list(islice(lv_prev_it, 2))
-    print("number_normal", number_normal)
+    # print("number_normal", number_normal)
 
     d = [curr_start_node] + list(islice(lv_prev_it, number_normal)) + [curr_stop_node]
     lv_top.append(Node(dict(zip(range(start_split_[0], start_split_[0] + number_normal + 2), d)), l))
@@ -374,9 +325,6 @@ def crange(start, stop, step, base) -> tuple[Node, list[Node]]:
   elif not separate_start_group and not separate_stop_group:  # checked
     list(islice(lv_prev_it, start_group))
     lv_top.append(Node(dict(zip(range(start_split_[0], last_number_split_[0] + 1), islice(lv_prev_it, BASE))), l))
-
-  else:
-    print("WOW THIS SHOULD NEVER OCCUR")
 
   lvs.append(lv_top)
   to_add.reverse()
@@ -402,25 +350,28 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  base = 16
+  base = 2
   # good edge cases (1002, 3), (2130, 3), (5201, 3)
   # good start cases: dangly edges: (3, 301, 199), (3, 4125, 4129), (3, 199, 321)
   # (827, 2977, 8)
   # (121, 1165, 3)
   # (841, 1275, 7)
-  start, stop, step = (37, 137, 20)  # BASE 16
+  # start, stop, step = (37, 137, 20)  # BASE 16
   # start, stop, step = (94, 2000, 8)
   # start, stop, step = (100000, 292815, 80)
+  start, stop, step = (94210, 94283, 24)
+  start, stop, step = (94210, 94283, 24)
+
 
   rn, l = crange(start, stop, step, base)
   print("BASE", base)
-  print(repr(rn))
+  # print(repr(rn))
 
-  print(sorted(map(tuple, rn.paths())))
+  # print(sorted(map(tuple, rn.paths())))
   r = [i for i in range(start, stop, step)]
   print("real  ", [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))])
   print("wanted", r)
-  assert(r == [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))])
+  # assert(r == [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))])
   print(len(r))
   # print(max(map(to_number, rn.paths())))
 
@@ -433,3 +384,5 @@ if __name__ == '__main__':
     if not n % step == m:
       print("INCORRECT NUMBERS from", n)
       break
+  print()
+  print_graph(l)
