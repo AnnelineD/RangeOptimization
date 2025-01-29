@@ -56,7 +56,7 @@ class HandpickedTests(unittest.TestCase):
             (101, 229, 66, 10),
             (121, 1165, 3, 10),
             (94210, 94283, 24, 2),   # start_group reset
-            (100000, 292815, 80)
+            (100000, 292815, 80, 10)
         ]
 
         self.assertListEqual([], compare_ranges(tests))
