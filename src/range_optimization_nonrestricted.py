@@ -62,24 +62,12 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   offset = start%step
 
   std_nodes = int(step/gcd(BASE**(order(step, base) + 1), step))
-  # print("std nodes", std_nodes)
 
   start_split_, last_number_split_, to_add = strip_equal_start(start_split, last_number_split)
 
 
-
-  # print("last number", last_number)
-  print(last_number_split)
-  print(start, start_split)
-
-  # print("to add", to_add)
-
   # calculate the number of nodes in each layer, which is not the lowest or highest layer
   size_intermediate_layers = number_of_nodes_per_layer(start_split_, last_number_split_, step, base)
-  # print("size_intermediate_layers", size_intermediate_layers)
-
-
-
 
 
   pat = minimal_seq(pattern_ext(step, offset, base))
@@ -88,12 +76,9 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   pat_start_idx = pat.index(to_number(start_split_[-(order(step, base) + 1):], base))
   pat_stop_idx = pat.index(to_number(last_number_split[-(order(step, base) + 1):], base))
 
-  print("pattern", pat)
-  # print("first idx", pat_start_idx)
-  # print("stop idx", pat_stop_idx)
 
   r1 = repetition_ext(step, offset, base)
-    # compress r1 only if pattern is also compressed
+  # compress r1 only if pattern is also compressed
   if len(pat) == sum(minimal_seq(r1)):
     r1_ = minimal_seq(r1)
   else:
@@ -101,26 +86,14 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   assert pat_start_idx <= sum(r1_)
 
-  # print("r1", r1)
-  # print("r1_", r1_)
-
-
   start_group, start_idx = find_group(pat, r1_, to_number(start_split_[-(order(step, base) + 1):], base))
-  separate_start_group = (start_idx != 0)
+  separate_start_group: bool = (start_idx != 0)
 
   stop_group, stop_idx = find_group(pat, r1_, to_number(last_number_split[-(order(step, base) + 1):], base))
-  separate_stop_group = (stop_idx != (r1_[stop_group] - 1))
-
-  print("(start group, start index)", (start_group, start_idx))
-  # print("(stop group, stop index)", (stop_group, stop_idx))
+  separate_stop_group: bool = (stop_idx != (r1_[stop_group] - 1))
 
 
-  # print("separate start", separate_start_group)
-  # print("separate stop", separate_stop_group)
-
-
-
-  # bottom layer
+  # bottom layer (leaf nodes)
   l = []
   lv1 = []
 
@@ -146,10 +119,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   if separate_start_group:
     last_idx_start_group = pat_start_idx + r1_[start_group] - (start_idx + 1)
-    # print("last_idx_start_group", last_idx_start_group)
-
     lv1_start_node = Node(dict(zip(pat[pat_start_idx:last_idx_start_group + 1], repeat(()))), l)
-    # print("start lvl", lv1_start_node.cd)
 
     curr_start_node = lv1_start_node
 
@@ -158,11 +128,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   if separate_stop_group:
     first_idx_stop_group = pat_stop_idx - stop_idx
-    print("last_idx_stop_group", first_idx_stop_group)
-
-
     lv1_stop_node = Node(dict(zip(pat[first_idx_stop_group:pat_stop_idx + 1], repeat(()))), l)
-    print("start lvl stop node", lv1_stop_node.cd)
 
     curr_stop_node = lv1_stop_node
 
@@ -179,56 +145,33 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   for i, nns in enumerate(size_intermediate_layers):
 
-    print("LAYER", i)
-
-    print(separate_start_group, separate_stop_group)
-    # print("stop group", stop_group)
-    # print("stop_groups_to_skip", stop_groups_to_skip)
-
     lv_curr = []
     lv_prev = lvs[-1]
-    # lv_stop = []
-
-
-    # print("prev nodes", [l.idc for l in lv_prev])
 
     stop_groups_to_skip = (eq_stop_node - last_number_split_[curr_start_idx]) % std_nodes_
 
-    if separate_start_group:  #checked
+    if separate_start_group:
       lv_prev_it = iter(cycle(lv_prev))
       list(islice(lv_prev_it, next_start_group))
       v = [curr_start_node] + list(islice(lv_prev_it, BASE - start_split_[curr_start_idx] - 1))
 
       next_start_node = Node(dict(zip(range(start_split_[curr_start_idx], BASE), v)), l)
-      # print("next start node", next_start_node, next_start_node.cd)
 
       curr_start_node = next_start_node
 
 
-
-
     if not separate_start_group:
 
-      # print("start idx", curr_start_idx)
-      # print("start number", start_split_[curr_start_idx])
-
       if start_split_[curr_start_idx] > 0:
-        # print("CASE start_split[curr_start_idx] > 0")
         lv_prev_it = iter(cycle(lv_prev))
         list(islice(lv_prev_it, start_group))
         separate_start_group = True
         curr_start_node = Node(dict(zip(range(start_split_[curr_start_idx], BASE), islice(lv_prev_it, (BASE - start_split_[curr_start_idx])))), l)
 
-        #  print("current start node", curr_start_node, curr_start_node.cd)
-
 
       else:
-        print("CASE start_split[curr_start_idx] == 0")
-        # print("curr_start", start_split_[curr_start_idx])
-        print("I will skip", start_group)
         lv_prev_it = iter(cycle(lv_prev))
-        list(islice(lv_prev_it, start_group))   # ???
-
+        list(islice(lv_prev_it, start_group))
 
 
     next_eq_stop_node = None
@@ -253,43 +196,33 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       pass
 
 
-    if separate_stop_group: #checked
+    if separate_stop_group:
       lv_prev_it_stop = iter(cycle(lv_prev))
       list(islice(lv_prev_it_stop, stop_groups_to_skip))
-
-      # print("stop number", last_number_split_[curr_start_idx])
       v = list(islice(lv_prev_it_stop, last_number_split_[curr_start_idx])) + [curr_stop_node]
 
       next_stop_node = Node(dict(zip(range(0, last_number_split_[curr_start_idx] + 1), v)), l)
-      # print("next stop node", next_stop_node, next_stop_node.cd)
-
       curr_stop_node = next_stop_node
 
     if not separate_stop_group:
-      if last_number_split[curr_start_idx] < BASE - 1:    # checked (88, 2100, 15)
-        # print("case last_number_split[curr_start_idx] < BASE - 1")
+      if last_number_split[curr_start_idx] < BASE - 1:
         lv_prev_it_stop = iter(cycle(lv_prev))
 
         list(islice(lv_prev_it_stop, stop_groups_to_skip))
 
         separate_stop_group = True
         curr_stop_node = Node(dict(zip(range(0, last_number_split_[curr_start_idx] + 1), islice(lv_prev_it_stop, last_number_split_[curr_start_idx] + 1))), l)
-        # print("curr stop node", curr_stop_node, curr_stop_node.cd)
 
 
       else:
-        # print("case last_number_split[curr_start_idx] == BASE - 1")   # test (88, 9990, 15)
         pass
 
     curr_start_idx -= 1
     lvs.append(lv_curr)
+    start_group = 0
     next_start_group = 0
     std_nodes_ = std_nodes
     eq_stop_node = next_eq_stop_node
-    start_group = 0
-
-
-  print("end", separate_start_group, separate_stop_group)
 
   # top layer
   lv_top = []
@@ -301,16 +234,11 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     d = [curr_start_node] + list(islice(lv_prev_it, BASE))
 
     list(islice(lv_prev_it, 1))
-    # print("last nr", last_number_split_[0])
-
     lv_top.append(Node(dict(zip(range(start_split_[0], last_number_split_[0] + 1), d)), l))
 
   elif separate_start_group and separate_stop_group:   # checked
     list(islice(lv_prev_it, next_start_group))
     number_normal = last_number_split_[0] - start_split_[0] - 1
-
-    # list(islice(lv_prev_it, 2))
-    # print("number_normal", number_normal)
 
     d = [curr_start_node] + list(islice(lv_prev_it, number_normal)) + [curr_stop_node]
     lv_top.append(Node(dict(zip(range(start_split_[0], start_split_[0] + number_normal + 2), d)), l))
@@ -360,7 +288,7 @@ if __name__ == '__main__':
   # start, stop, step = (94, 2000, 8)
   # start, stop, step = (100000, 292815, 80)
   start, stop, step = (94210, 94283, 24)
-  start, stop, step = (94210, 94283, 24)
+  start, stop, step = (0, 1, 24)
 
 
   rn, l = crange(start, stop, step, base)
