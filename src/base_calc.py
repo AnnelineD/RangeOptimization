@@ -2,8 +2,11 @@
 
 def numberToBase(n, b):
     # numberToBase(1324, 10) = [1, 3, 2, 4]
+    assert b > 0
     if n == 0:
         return [0]
+    if b == 1:
+        return [n]
     digits = []
     while n:
         digits.append(int(n % b))
