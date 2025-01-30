@@ -1,3 +1,4 @@
+from collections import deque
 from itertools import repeat, cycle, islice
 from math import gcd
 
@@ -12,6 +13,10 @@ def nth(it, n):
     for i in range(n):
         x = next(it)
     return x
+
+
+def skip_elements(iterator, count):
+  deque(islice(iterator, count), maxlen=0)
 
 
 def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node]]:
@@ -216,21 +221,16 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   lv_prev_it = iter(cycle(lvs[-1]))
 
-  if separate_start_group:
-    list(islice(lv_prev_it, next_start_group))
-    fn = [curr_start_node]
-  else:
-    list(islice(lv_prev_it, start_group))
-    fn = []
+  skip_elements(lv_prev_it, next_start_group if separate_start_group else start_group)
 
-  if separate_stop_group:
-    ln = [curr_stop_node]
-    slice_size = last_number_split_[0] - start_split_[0] - (1 if separate_start_group else 0)
-  else:
-    ln = []
-    slice_size = last_number_split_[0] - start_split_[0] + 1 - (1 if separate_start_group else 0)
+  # Initialize first and last nodes
+  first_node = [curr_start_node] if separate_start_group else []
+  last_node = [curr_stop_node] if separate_stop_group else []
 
-  nodes = fn + list(islice(lv_prev_it, slice_size)) + ln
+  # Compute slice size of middle nodes
+  slice_size = (last_number_split_[0] - start_split_[0] + 1) - separate_start_group - separate_stop_group
+
+  nodes = first_node + list(islice(lv_prev_it, slice_size)) + last_node
   edge_labels = range(start_split_[0], last_number_split_[0] + 1)
 
   top_node = Node(dict(zip(edge_labels, nodes)), l)
