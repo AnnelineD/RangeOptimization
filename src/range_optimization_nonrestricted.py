@@ -217,30 +217,24 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   lv_prev_it = iter(cycle(lvs[-1]))
 
-  if separate_start_group and not separate_stop_group:
+  if separate_start_group:
     list(islice(lv_prev_it, next_start_group))
-    d = [curr_start_node] + list(islice(lv_prev_it, BASE))
-
-    list(islice(lv_prev_it, 1))
-    lv_top.append(Node(dict(zip(range(start_split_[0], last_number_split_[0] + 1), d)), l))
-
-  elif separate_start_group and separate_stop_group:   # checked
-    list(islice(lv_prev_it, next_start_group))
-    number_normal = last_number_split_[0] - start_split_[0] - 1
-
-    d = [curr_start_node] + list(islice(lv_prev_it, number_normal)) + [curr_stop_node]
-    lv_top.append(Node(dict(zip(range(start_split_[0], start_split_[0] + number_normal + 2), d)), l))
-
-  elif not separate_start_group and separate_stop_group:
+    fn = [curr_start_node]
+  else:
     list(islice(lv_prev_it, start_group))
-    number_normal = last_number_split_[0] - start_split_[0]
-    d = list(islice(lv_prev_it, number_normal)) + [curr_stop_node]
-    lv_top.append(Node(dict(zip(range(start_split_[0], start_split_[0] + number_normal + 1), d)), l))
+    fn = []
 
+  if separate_stop_group:
+    ln = [curr_stop_node]
+    slice_size = last_number_split_[0] - start_split_[0] - (1 if separate_start_group else 0)
+  else:
+    ln = []
+    slice_size = last_number_split_[0] - start_split_[0] + 1 - (1 if separate_start_group else 0)
 
-  elif not separate_start_group and not separate_stop_group:  # checked
-    list(islice(lv_prev_it, start_group))
-    lv_top.append(Node(dict(zip(range(start_split_[0], last_number_split_[0] + 1), islice(lv_prev_it, BASE))), l))
+  nodes = fn + list(islice(lv_prev_it, slice_size)) + ln
+  edge_labels = range(start_split_[0], last_number_split_[0] + 1)
+
+  lv_top.append(Node(dict(zip(edge_labels, nodes)), l))
 
   lvs.append(lv_top)
   to_add.reverse()
