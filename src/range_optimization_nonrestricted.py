@@ -213,7 +213,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
 
   # top layer
-  lv_top = []
 
   lv_prev_it = iter(cycle(lvs[-1]))
 
@@ -234,14 +233,14 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   nodes = fn + list(islice(lv_prev_it, slice_size)) + ln
   edge_labels = range(start_split_[0], last_number_split_[0] + 1)
 
-  lv_top.append(Node(dict(zip(edge_labels, nodes)), l))
+  top_node = Node(dict(zip(edge_labels, nodes)), l)
 
-  lvs.append(lv_top)
+  # lvs.append([top_node])
   to_add.reverse()
   for e in to_add:
-    lvs.append([Node({e: lvs[-1][0]}, l)])
+    top_node = Node({e: top_node}, l)
 
-  return lvs[-1][0], l
+  return top_node, l
 
 
 def print_graph(l):
