@@ -28,13 +28,15 @@ class HandpickedTests(unittest.TestCase):
 
     def test_one_layer_only(self):
         tests = [(0, 9, 3, 10), (2, 98, 15, 10)]
+        test_with_to_add = [(1000, 1009, 3, 10)]
 
-        self.assertListEqual([], compare_ranges(tests))
+        self.assertListEqual([], compare_ranges(tests + test_with_to_add))
 
     def test_no_intermediate_layers(self):
         tests = [(0, 99, 3, 10), (175, 764, 87, 10)]
+        test_with_to_add = [(1000, 1099, 3, 10)]
 
-        self.assertListEqual([], compare_ranges(tests))
+        self.assertListEqual([], compare_ranges(tests + test_with_to_add))
 
     def test_size_intermediate_layers_edge_case(self):
         tests = [(0, 292815, 8, 10), (94, 2000, 8, 10)]   # edge case for size intermediate layers!

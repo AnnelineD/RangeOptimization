@@ -92,13 +92,12 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # in the case there will only be one layer (only leaf nodes)
   if len(last_number_split_) == (order(step, base) + 1):
-    lv1_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
-    lvs = [[lv1_node]]
+    curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
     to_add.reverse()
     for e in to_add:
-      lvs.append([Node({e: lvs[-1][0]}, l)])
+      curr_node = Node({e: curr_node}, l)
 
-    return lvs[-1][0], l
+    return curr_node, l
 
   # make leaf layer
   for tk in r1_:
@@ -129,7 +128,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   # intermediate layers
 
   size_intermediate_layers.reverse()
-  next_start_group = (start_group + 1)%len(r1_)
+  next_start_group = (start_group + 1) %len(r1_)  # correct both with or without the modulo (without modulo, we might go through one cycle more of the previous level nodes)
 
   std_nodes_ = len(r1_)
   eq_stop_node = stop_group
@@ -177,8 +176,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       if peek_node == first_node:
         break
 
-
-
     if next_eq_stop_node is None:
       # This should never occur
       raise NotImplementedError
@@ -206,12 +203,14 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       else:
         pass
 
-    curr_start_idx -= 1
     lvs.append(lv_curr)
+
+    curr_start_idx -= 1
     start_group = 0
     next_start_group = 0
     std_nodes_ = std_nodes
     eq_stop_node = next_eq_stop_node
+
 
   # top layer
   lv_top = []
@@ -259,8 +258,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  base = 2
-  start, stop, step = (94210, 94283, 24)
+  start, stop, step, base = (20908, 65539, 35, 16)
 
 
   rn, l = crange(start, stop, step, base)
