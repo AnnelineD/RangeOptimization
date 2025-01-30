@@ -29,21 +29,24 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   if stop == start:
     return # TODO empty graph??
 
+  l = []
   start_split_1 = numberToBase(start, base)
+  step_order = order(step, base)
 
+  # Generate a tree with only the start number
   if stop - start <= step:
-    l = []
-    prev_node = ()
-    if order(step, base) >= order(start, base):
+    curr_node = ()
+    if step_order >= order(start, base):  # create only one node with digit of order(step)
       curr_node = Node({start: ()}, l)
     else:
-      trail, leaf = start_split_1[:-(order(step, base) + 1)], to_number(start_split_1[-(order(step, base) + 1):], base)
-      trail.reverse()
-      for s in [leaf] + trail:
-        curr_node = Node({s: prev_node}, l)
-        prev_node = curr_node
+      trailing_digits = start_split_1[:-(step_order + 1)]   # all digits that need to come before the leaf node
+      leaf = to_number(start_split_1[-(step_order + 1):], base)  # leaf node of order == order(step)
+      trailing_digits.reverse()
 
-      # you can use this instead of the if/else for simplicity. BUT an inconsitency arrises with the other trees since other trees have number of order(step), in their leaf nodes, and with following code this special case returns leafs of order 0. So use the if/else above for consistency.
+      for s in [leaf] + trailing_digits:
+        curr_node = Node({s: curr_node}, l)
+
+      # you can use this instead of the if/else for simplicity. BUT an inconsistency arises with the other trees since other trees have number of order(step), in their leaf nodes, and with following code this special case returns leafs of order 0. So use the if/else above for consistency.
       # for s in reversed(start_split_1):
       #   curr_node = Node({s: prev_node}, l)
       #   prev_node = curr_node
@@ -90,7 +93,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
 
   # bottom layer (leaf nodes)
-  l = []
   lv1 = []
 
   pat_it = iter(cycle(pat))
