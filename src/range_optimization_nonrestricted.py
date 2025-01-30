@@ -111,7 +111,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   for tk in r1_:
     lv1.append(Node(dict(zip(islice(pat_it, tk), repeat(()))), l))
 
-  lvs = [lv1]
+  lv_prev = lv1
 
   # extra start node
   curr_start_node = None
@@ -146,7 +146,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   for i, nns in enumerate(size_intermediate_layers):
 
     lv_curr = []
-    lv_prev = lvs[-1]
     lv_prev_it = iter(cycle(lv_prev))
 
     skip_elements(lv_prev_it, to_skip)
@@ -191,7 +190,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       nodes = islice(lv_prev_it_stop, last_number_split_[curr_start_idx] + 1)
       curr_stop_node = Node(dict(zip(range(0, last_number_split_[curr_start_idx] + 1), nodes)), l)
 
-    lvs.append(lv_curr)
+    lv_prev = lv_curr
 
     curr_start_idx -= 1
     to_skip = 0
@@ -201,8 +200,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # top layer
 
-  lv_prev_it = iter(cycle(lvs[-1]))
-
+  lv_prev_it = iter(cycle(lv_prev))
   skip_elements(lv_prev_it, to_skip)
 
   # Initialize first and last nodes
