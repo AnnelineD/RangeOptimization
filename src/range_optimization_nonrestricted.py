@@ -4,7 +4,7 @@ from math import gcd
 
 from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
 from src.node import Node
-from src.pattern import minimal_seq, pattern_ext, repetition_ext
+from src.pattern import minimal_seq, pattern_ext, repetition_ext, one_up
 from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group
 
 
@@ -17,6 +17,43 @@ def nth(it, n):
 
 def skip_elements(iterator, count):
   deque(islice(iterator, count), maxlen=0)
+
+
+def base_layer(step, base, l_, offset):
+  step_order = order(step, base)
+  step_split = numberToBase(step, base)
+
+  pat1 = minimal_seq(pattern_ext(step_split[-1], offset, base))
+
+  lv1 = []
+
+  for p in pat1:
+    lv1.append(Node({p: ()}, l_))
+
+  lv_prev = lv1
+  for i in range(step_order - 1):
+    lv_new = []
+    r = minimal_seq(repetition_ext(to_number(step_split[-(i+1):], base), offset, base))
+
+    pat = minimal_seq(one_up(r, base, step_split[i - 2]))
+
+    lv_prev_it = iter(cycle(lv_prev))
+    for p in pat:
+      lv_new.append(Node({p: next(lv_prev_it)}, l_))
+    lv_prev = lv_new
+
+
+  lv3 = []
+  pat3 = minimal_seq(one_up(repetition_ext(to_number(step_split[1:], base), offset, base), base, step_split[0]))
+
+  r3 = minimal_seq(repetition_ext(step, offset, base))
+  lv2_it = iter(cycle(lv_prev))
+  pat3_it = iter(cycle(pat3))
+  for tk in r3:
+    lv3.append(Node(dict(zip(list(islice(pat3_it, tk)), list(islice(lv2_it, tk)))), l_))
+
+  return lv3
+
 
 
 def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node]]:
@@ -108,10 +145,15 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     return curr_node, l
 
   # make leaf layer
-  for tk in r1_:
-    lv1.append(Node(dict(zip(islice(pat_it, tk), repeat(()))), l))
+  if order(step, base) == 0:
+    for tk in r1_:
+      lv1.append(Node(dict(zip(islice(pat_it, tk), repeat(()))), l))
+
+  else:
+    lv1 = base_layer(step, base, l, offset)
 
   lv_prev = lv1
+  print("len lv1", len(lv1))
 
   # extra start node
   curr_start_node = None
@@ -231,7 +273,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (20908, 65539, 35, 16)
+  start, stop, step, base = (0, 10000, 123, 10)
 
 
   rn, l = crange(start, stop, step, base)
@@ -240,7 +282,7 @@ if __name__ == '__main__':
 
   # print(sorted(map(tuple, rn.paths())))
   r = [i for i in range(start, stop, step)]
-  print("real  ", [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))])
+  print("real  ", [to_number(i, base) for i in (sorted(map(tuple, rn.paths())))])
   print("wanted", r)
   # assert(r == [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))])
   print(len(r))
@@ -249,7 +291,7 @@ if __name__ == '__main__':
   print("#wanted: ", len(range(start, stop, step)), "#real: ", sum(1 for _ in rn.paths()))
   print("check: ", len(range(start, stop, step)), "#real: ", sum(1 for _ in rn.paths()))
 
-  ns = (map(lambda x: to_number_special(list(x), order(step, base), base), rn.paths()))
+  ns = (map(lambda x: to_number(list(x), base), rn.paths()))
   m = start % step
   for n in ns:
     if not n % step == m:
@@ -257,3 +299,11 @@ if __name__ == '__main__':
       break
   print()
   print_graph(l)
+
+  print()
+  print()
+  print()
+
+  # l_ = []
+  # base_layer(125, 10, l_)
+  # print_graph(l_)

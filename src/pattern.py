@@ -1,4 +1,4 @@
-from itertools import groupby
+from itertools import groupby, cycle, islice
 from math import lcm
 
 from src.base_calc import numberToBase
@@ -56,4 +56,18 @@ def repetition_offset(n, offset, base):
 def repetition_ext(n, offset, base):
   order = len(numberToBase(n, base))
   return repetition_offset(n, offset, base**order)
+
+
+def one_up(rep3, base, num_up = 1):
+    it = iter(cycle(rep3))
+
+    seq = []
+    i = 0
+    for n in islice(it, base ** 2):
+        for n_ in range(n):
+            seq.append(i)
+            i = (i + num_up) % base
+        i = (i + 1) % base
+
+    return seq
 
