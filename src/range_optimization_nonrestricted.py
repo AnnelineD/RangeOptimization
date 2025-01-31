@@ -274,7 +274,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (0, 100000, 1125, 10)
+  start, stop, step, base = (0, 1000, 20, 10)
 
 
   rn, l = crange(start, stop, step, base)

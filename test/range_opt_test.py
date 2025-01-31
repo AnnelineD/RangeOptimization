@@ -1,7 +1,7 @@
 import unittest
 from random import randint
 
-from src.base_calc import order
+from src.base_calc import order, to_number
 from src.range_optimization_nonrestricted import crange, to_number_special
 
 
@@ -10,7 +10,7 @@ def compare_range(start, stop, step, base) -> bool:
     rn, l = crange(start, stop, step, base)
 
     wanted_range = list(range(start, stop, step))
-    opt_range = [to_number_special(i, order(step, base), base) for i in (sorted(map(tuple, rn.paths())))]
+    opt_range = [to_number(i, base) for i in (sorted(map(tuple, rn.paths())))]
 
     return wanted_range == opt_range
 
