@@ -6,10 +6,9 @@ from src.base_calc import numberToBase
 
 def minimal_seq(xs: list[int]) -> list[int]:
     # `minimal_seq(xs)` returns the minimal sequence `r` such that `cycle(r) = cycle(xs)`
-    # cycle([25, 24, 25, 24]) == cycle([25, 24])
-    # cycle([4, 4, 4]) == cycle([4])
-    # cycle([1, 2, 3]) == cycle([1, 2, 3])
     n = len(xs)
+    if n == 0:
+        return xs
     pi = [0] * n
     for i in range(1, n):
         k = pi[i - 1]
