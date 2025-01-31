@@ -22,6 +22,8 @@ def skip_elements(iterator, count):
 def base_layer(step, base, l_, offset):
   step_order = order(step, base)
   step_split = numberToBase(step, base)
+  offset_split = numberToBase(offset, base)
+  offset_split = to_size(offset_split, len(step_split))
 
   pat1 = minimal_seq(pattern_ext(step_split[-1], offset, base))
 
@@ -35,7 +37,7 @@ def base_layer(step, base, l_, offset):
     lv_new = []
     r = minimal_seq(repetition_ext(to_number(step_split[-(i+1):], base), offset, base))
 
-    pat = minimal_seq(one_up(r, base, step_split[i - 2]))
+    pat = minimal_seq(one_up(r, base, step_split[-(i + 2)]))
 
     lv_prev_it = iter(cycle(lv_prev))
     for p in pat:
@@ -73,20 +75,19 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   # Generate a tree with only the start number
   if stop - start <= step:
     curr_node = ()
-    if step_order >= order(start, base):  # create only one node with digit of order(step)
-      curr_node = Node({start: ()}, l)
-    else:
-      trailing_digits = start_split_1[:-(step_order + 1)]   # all digits that need to come before the leaf node
-      leaf = to_number(start_split_1[-(step_order + 1):], base)  # leaf node of order == order(step)
-      trailing_digits.reverse()
-
-      for s in [leaf] + trailing_digits:
-        curr_node = Node({s: curr_node}, l)
+    # if step_order >= order(start, base):  # create only one node with digit of order(step)
+    #   curr_node = Node({start: ()}, l)
+    # else:
+    #   trailing_digits = start_split_1[:-(step_order + 1)]   # all digits that need to come before the leaf node
+    #   leaf = to_number(start_split_1[-(step_order + 1):], base)  # leaf node of order == order(step)
+    #   trailing_digits.reverse()
+    #
+    #   for s in [leaf] + trailing_digits:
+    #     curr_node = Node({s: curr_node}, l)
 
       # you can use this instead of the if/else for simplicity. BUT an inconsistency arises with the other trees since other trees have number of order(step), in their leaf nodes, and with following code this special case returns leafs of order 0. So use the if/else above for consistency.
-      # for s in reversed(start_split_1):
-      #   curr_node = Node({s: prev_node}, l)
-      #   prev_node = curr_node
+    for s in reversed(start_split_1):
+      curr_node = Node({s: curr_node}, l)
 
     return curr_node, l
 
@@ -273,7 +274,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (0, 10000, 123, 10)
+  start, stop, step, base = (0, 100000, 1125, 10)
 
 
   rn, l = crange(start, stop, step, base)
