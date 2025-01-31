@@ -1,6 +1,6 @@
 import unittest
 
-from src.pattern import minimal_seq, pattern_ext, repetition_ext
+from src.pattern import minimal_seq, pattern_ext, repetition_ext, repetition_offset, one_up
 
 
 class PatternGenerationTests(unittest.TestCase):
@@ -25,17 +25,35 @@ class PatternGenerationTests(unittest.TestCase):
         self.assertEqual([3], pattern_ext(0, 3, 10))
 
     def test_repetition_generation(self):
-        self.assertEqual([4, 3, 3], repetition_ext(3, 0, 10))
-        self.assertEqual([3, 4, 3], repetition_ext(3, 1, 10))
-        self.assertEqual([3, 3, 4], repetition_ext(3, 2, 10))
+        self.assertEqual([4, 3, 3], repetition_offset(3, 0, 10))
+        self.assertEqual([3, 4, 3], repetition_offset(3, 1, 10))
+        self.assertEqual([3, 3, 4], repetition_offset(3, 2, 10))
 
-        self.assertEqual([2, 1, 2, 1, 2, 1, 1], repetition_ext(7, 0, 10))
-        self.assertEqual([2, 1, 2, 1, 1, 2, 1], repetition_ext(7, 1, 10))
-        self.assertEqual([2, 1, 1, 2, 1, 2, 1], repetition_ext(7, 2, 10))
-        self.assertEqual([1, 2, 1, 2, 1, 2, 1], repetition_ext(7, 3, 10))
-        self.assertEqual([1, 2, 1, 2, 1, 1, 2], repetition_ext(7, 4, 10))
+        self.assertEqual([2, 1, 2, 1, 2, 1, 1], repetition_offset(7, 0, 10))
+        self.assertEqual([2, 1, 2, 1, 1, 2, 1], repetition_offset(7, 1, 10))
+        self.assertEqual([2, 1, 1, 2, 1, 2, 1], repetition_offset(7, 2, 10))
+        self.assertEqual([1, 2, 1, 2, 1, 2, 1], repetition_offset(7, 3, 10))
+        self.assertEqual([1, 2, 1, 2, 1, 1, 2], repetition_offset(7, 4, 10))
 
-        self.assertEqual([0], repetition_ext(0, 5, 10))
+        self.assertEqual([0], repetition_offset(0, 5, 10))
+
+    def test_one_up(self):
+        # e.g. 23
+        # pattern(3) = [0, 3, 6, 9, 2, 5, 8, 1, 4, 7]
+        # repetition(5) = [4, 3, 3]
+        # pattern: [0, 3, 6, 9, 2, 5, 8, 1, 4, 7, 0, 3, 6, 9, 2, 5, 8, 1, 4, 7, 0, 3, 6, 9, 2, 5, 8, 1, 4, 7]
+        # one_up : [0, 2, 4, 6, 9, 1, 3, 6, 8, 0, 3, 5, 7, 9, 2, 4, 6, 9, 1, 3, 6, 8, 0, 2, 5, 7, 9, 2, 4, 6]
+        self.assertEqual([0, 2, 4, 6, 9, 1, 3, 6, 8, 0, 3, 5, 7, 9, 2, 4, 6, 9, 1, 3, 6, 8, 0, 2, 5, 7, 9, 2, 4, 6, 9, 1, 3, 5, 8, 0, 2, 5, 7, 9, 2, 4, 6, 8, 1, 3, 5, 8, 0, 2, 5, 7, 9, 1, 4, 6, 8, 1, 3, 5, 8, 0, 2, 4, 7, 9, 1, 4, 6, 8, 1, 3, 5, 7, 0, 2, 4, 7, 9, 1, 4, 6, 8, 0, 3, 5, 7, 0, 2, 4, 7, 9, 1, 3, 6, 8, 0, 3, 5, 7],
+                         (one_up([4, 3, 3], 10, 2)[:100]))
+
+
+        # e.g. 25
+        # pattern(5) = [0, 5]
+        # repetition(5) = [2]
+        # pattern: 0 5 0 5 0 5 0 5
+        # one_up : 0 2 5 7 0 2 5 7
+        self.assertEqual([0, 2, 5, 7]*50, one_up([2], 10, 2))
+
 
 
 if __name__ == '__main__':
