@@ -51,6 +51,9 @@ def repetition_ext(n, offset, base):
 def one_up(rep3, base, num_up = 1):
     it = iter(cycle(rep3))
 
+    if rep3 == [0]:
+        return pattern_ext(num_up, 0, base)
+
     seq = []
     i = 0
     for n in islice(it, base ** 2):
