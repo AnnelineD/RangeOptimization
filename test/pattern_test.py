@@ -1,6 +1,6 @@
 import unittest
 
-from src.pattern import minimal_seq, pattern_ext
+from src.pattern import minimal_seq, pattern_ext, repetition_ext
 
 
 class PatternGenerationTests(unittest.TestCase):
@@ -23,6 +23,19 @@ class PatternGenerationTests(unittest.TestCase):
 
         self.assertEqual([0], pattern_ext(0, 0, 10))
         self.assertEqual([3], pattern_ext(0, 3, 10))
+
+    def test_repetition_generation(self):
+        self.assertEqual([4, 3, 3], repetition_ext(3, 0, 10))
+        self.assertEqual([3, 4, 3], repetition_ext(3, 1, 10))
+        self.assertEqual([3, 3, 4], repetition_ext(3, 2, 10))
+
+        self.assertEqual([2, 1, 2, 1, 2, 1, 1], repetition_ext(7, 0, 10))
+        self.assertEqual([2, 1, 2, 1, 1, 2, 1], repetition_ext(7, 1, 10))
+        self.assertEqual([2, 1, 1, 2, 1, 2, 1], repetition_ext(7, 2, 10))
+        self.assertEqual([1, 2, 1, 2, 1, 2, 1], repetition_ext(7, 3, 10))
+        self.assertEqual([1, 2, 1, 2, 1, 1, 2], repetition_ext(7, 4, 10))
+
+        self.assertEqual([0], repetition_ext(0, 5, 10))
 
 
 if __name__ == '__main__':
