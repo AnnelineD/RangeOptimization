@@ -23,11 +23,7 @@ class Node:
 
     def full_dict(self):
         def rec(n):
-            match n:
-                case Node():
-                    return {k: rec(v) for k, v in n.cd.items()}
-                case _:
-                    return str(n)
+            return {k: rec(v) for k, v in n.cd.items()} if isinstance(n, Node) else str(n)
 
         return {k: rec(v) for k, v in self.cd.items()}
 
