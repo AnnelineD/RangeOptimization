@@ -62,7 +62,6 @@ def base_layer_with_offset(offset_, step_, base_, l_):
 
   step_split = numberToBase(step_, base_)
   n_layers = len(step_split)
-  # print("n_layers", n_layers)
 
   offset_split = to_size(numberToBase(offset_, base_), n_layers)
 
@@ -96,7 +95,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # Generate a tree with only the start number
   if stop - start <= step:
-    print("todo")
     curr_node = ()
     # if step_order >= order(start, base):  # create only one node with digit of order(step)
     #   curr_node = Node({start: ()}, l)
@@ -178,7 +176,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     else:
       lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base, l)
 
-      for i in range(2, n_layers - 1):
+      for i in range(2, n_layers):
         lv_next = next_step(offset_split[-i:], step_split[-i:], lv_prev, base, l)
         lv_prev = lv_next
 
@@ -333,7 +331,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (94210, 94283, 24, 2)
+  start, stop, step, base = (81050, 90985, 3374, 10)
 
 
   rn, l = crange(start, stop, step, base)

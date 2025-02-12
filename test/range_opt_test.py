@@ -33,7 +33,7 @@ class HandpickedTests(unittest.TestCase):
         self.assertListEqual([], compare_ranges(tests + test_with_to_add))
 
     def test_no_intermediate_layers(self):
-        tests = [(0, 99, 3, 10), (175, 764, 87, 10)]
+        tests = [(0, 99, 3, 10), (175, 764, 87, 10), (81050, 90985, 3374, 10)]
         test_with_to_add = [(1000, 1099, 3, 10)]
 
         self.assertListEqual([], compare_ranges(tests + test_with_to_add))
@@ -113,11 +113,11 @@ class HandpickedTests(unittest.TestCase):
 
 
 class GeneratedTestCases(unittest.TestCase):
-    def param_generator(self, base = None):
+    def param_generator(self, max_step = 99, base = None):
         if not base:
             base = randint(2, 200)
 
-        step = randint(1, 99)
+        step = randint(1, max_step)
         start = randint(0, 100000)
         stop = randint(start, 300000)
 
@@ -125,15 +125,23 @@ class GeneratedTestCases(unittest.TestCase):
 
 
     def test_base_10(self):
-        tests = [self.param_generator(10) for _ in range(100)]
+        tests = [self.param_generator(99, 10) for _ in range(100)]
         self.assertListEqual([], compare_ranges(tests))
 
     def test_base_16(self):
-        tests = [self.param_generator(16) for _ in range(100)]
+        tests = [self.param_generator(99, 16) for _ in range(100)]
         self.assertListEqual([], compare_ranges(tests))
 
     def test_random_bases(self):
         tests = [self.param_generator() for _ in range(100)]
+        self.assertListEqual([], compare_ranges(tests))
+
+    def test_big_step_base_10(self):
+        tests = [self.param_generator(99999, 10) for _ in range(100)]
+        self.assertListEqual([], compare_ranges(tests))
+
+    def test_big_step_any_base(self):
+        tests = [self.param_generator(99999) for _ in range(100)]
         self.assertListEqual([], compare_ranges(tests))
 
 
