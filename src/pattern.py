@@ -32,7 +32,7 @@ def pattern(n, offset, base):
 
     # instead of using lcm, one can use as stop criterion that the first generated number is reached again
     # following code is also correct and tested
-    # return [offset] + list(takewhile(lambda x: x != offset, ((k + offset)%base for k in range(n, n*base, n))))
+    # return [offset%base] + list(takewhile(lambda x: x != offset, ((k + offset)%base for k in range(n, n*base, n))))
     return [(k + offset) % base for k in range(0, lcm(base, n), n)]
 
 def pattern_ext(n, offset, base):
@@ -53,8 +53,8 @@ def repetition_offset(n, offset, base):
   assert offset >= 0
   assert offset < n  # if offset >= n, we can get a pattern (e.g. pattern_ext(3, 3, 10) = [3, 6, 9, 2, 5, 8, 1, 4, 7, 0]) such that the first and last element of the pattern belong to the same group
 
-  return [sum(1 for _ in r) for k, r in groupby(map(lambda x: (x + offset)//base, range(0, base*n, n)))]
-
+  # return [sum(1 for _ in r) for k, r in groupby(map(lambda x: (x + offset)//base, range(0, base*n, n)))]
+  return [sum(1 for _ in r) for k, r in groupby(map(lambda x: (x + offset) // base, range(0, lcm(base, n), n)))]
 
 def repetition_ext(n, offset, base):
   order = len(numberToBase(n, base))

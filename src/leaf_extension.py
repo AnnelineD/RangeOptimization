@@ -37,8 +37,8 @@ def last_layer(start_split, step_split, prev_nodes, base, l):
     pat_full = pattern(to_number(step_split, base), to_number(start_split, base), base ** len(step_split))
 
     r = repetition_offset(to_number(step_split, base), to_number(start_split, base), base ** len(step_split))
-    if len(pat_full) == sum(minimal_seq(r)):
-        r = minimal_seq(r)
+    # if len(pat_full) == sum(minimal_seq(r)):
+    #     r = minimal_seq(r)
 
     pat = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat_full]
     pat_it = iter(cycle(pat))

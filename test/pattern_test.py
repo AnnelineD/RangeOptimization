@@ -32,6 +32,8 @@ class PatternGenerationTests(unittest.TestCase):
         self.assertEqual([3, 4, 3], repetition_offset(3, 1, 10))
         self.assertEqual([3, 3, 4], repetition_offset(3, 2, 10))
 
+        self.assertEqual([2], repetition_offset(5, 0, 10))
+
         self.assertEqual([2, 1, 2, 1, 2, 1, 1], repetition_offset(7, 0, 10))
         self.assertEqual([2, 1, 2, 1, 1, 2, 1], repetition_offset(7, 1, 10))
         self.assertEqual([2, 1, 1, 2, 1, 2, 1], repetition_offset(7, 2, 10))

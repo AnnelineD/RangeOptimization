@@ -29,7 +29,6 @@ def base_layer(step, base, l_, offset):
   pat1 = minimal_seq(pattern_ext(step_split[-1], offset, base))
 
   lv1 = []
-
   for p in pat1:
     lv1.append(Node({p: ()}, l_))
 
@@ -139,7 +138,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   size_intermediate_layers = number_of_nodes_per_layer(start_split_, last_number_split_, step, base)
 
 
-  pat = minimal_seq(pattern_ext(step, offset, base))
+  pat = pattern_ext(step, offset, base)
 
   # the next two are also calculated in the find_group method (not efficient?)
   pat_start_idx = pat.index(to_number(start_split_[-(order(step, base) + 1):], base))
@@ -148,10 +147,11 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   r1 = repetition_ext(step, offset, base)
   # compress r1 only if pattern is also compressed
-  if len(pat) == sum(minimal_seq(r1)):
-    r1_ = minimal_seq(r1)
-  else:
-    r1_ = r1
+  # if len(pat) == sum(minimal_seq(r1)):
+  #   r1_ = minimal_seq(r1)
+  # else:
+  #   r1_ = r1
+  r1_ = r1
 
   assert pat_start_idx <= sum(r1_)
 
