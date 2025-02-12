@@ -62,7 +62,7 @@ def base_layer_with_offset(offset_, step_, base_, l_):
 
   step_split = numberToBase(step_, base_)
   n_layers = len(step_split)
-  print("n_layers", n_layers)
+  # print("n_layers", n_layers)
 
   offset_split = to_size(numberToBase(offset_, base_), n_layers)
 
@@ -72,12 +72,9 @@ def base_layer_with_offset(offset_, step_, base_, l_):
 
 
   for i in range(2, n_layers):
-    print("this loop")
     lv_next = next_step(offset_split[-i:], step_split[-i:], lv_prev, base_, l_)
     lv_prev = lv_next
 
-
-  print_graph(l_)
   return last_layer(offset_split, step_split, lv_prev, base_, l_)
 
 
@@ -122,8 +119,8 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   last_number_split = numberToBase(last_number, base)
 
   start_split = to_size(start_split_1, len(last_number_split))
-  print("start number", start_split)
-  print("last_number ", last_number_split)
+  # print("start number", start_split)
+  # print("last_number ", last_number_split)
 
   offset = start%step
 
@@ -131,8 +128,8 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   start_split_, last_number_split_, to_add = strip_equal_start(start_split, last_number_split)
 
-  print(to_add, start_split_)
-  print(to_add, last_number_split_)
+  # print(to_add, start_split_)
+  # print(to_add, last_number_split_)
 
   # calculate the number of nodes in each layer, which is not the lowest or highest layer
   size_intermediate_layers = number_of_nodes_per_layer(start_split_, last_number_split_, step, base)
@@ -171,7 +168,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   if len(last_number_split_) == (order(step, base) + 1):
     step_split = numberToBase(step, base)
     n_layers = len(step_split)
-    print("n_layers", n_layers)
 
     offset_split = to_size(numberToBase(offset, base), n_layers)
 
@@ -181,7 +177,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
     else:
       lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base, l)
-      print_graph(l)
 
       for i in range(2, n_layers - 1):
         lv_next = next_step(offset_split[-i:], step_split[-i:], lv_prev, base, l)
@@ -211,12 +206,10 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     lv1 = base_layer_with_offset(offset, step, base, l)
 
   lv_prev = lv1
-  print("len lv1", len(lv1))
 
   # extra start node
   curr_start_node = None
   curr_start_idx = - (order(step, base) + 2)
-  print(separate_start_group, separate_stop_group)
 
   if separate_start_group:
     last_idx_start_group = pat_start_idx + r1_[start_group] - (start_idx + 1)
@@ -241,7 +234,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
     curr_stop_node = lv1_stop_node
 
-  print_graph(l)
 
   # intermediate layers
 
