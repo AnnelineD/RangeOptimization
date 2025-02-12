@@ -54,6 +54,8 @@ class PatternGenerationTests(unittest.TestCase):
         # one_up : 0 2 5 7 0 2 5 7
         self.assertEqual([0, 2, 5, 7]*50, one_up([2], 10, 2))
 
+        print(minimal_seq(one_up([4, 3, 3], 10, 0)))
+
 
 
 if __name__ == '__main__':

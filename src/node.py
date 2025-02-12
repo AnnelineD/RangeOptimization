@@ -21,6 +21,16 @@ class Node:
             else:
                 print(f"n{self.idc} -> {k}")
 
+    def full_dict(self):
+        def rec(n):
+            match n:
+                case Node():
+                    return {k: rec(v) for k, v in n.cd.items()}
+                case _:
+                    return str(n)
+
+        return {k: rec(v) for k, v in self.cd.items()}
+
     def __repr__(self):
         nested = {k: str(v) for k, v in self.cd.items()}
         return f"N({self.idc}, {nested})"

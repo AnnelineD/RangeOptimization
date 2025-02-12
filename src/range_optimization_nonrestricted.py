@@ -3,6 +3,7 @@ from itertools import repeat, cycle, islice
 from math import gcd
 
 from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
+from src.leaf_extension import make_leaf_nodes, next_step, last_layer
 from src.node import Node
 from src.pattern import minimal_seq, pattern_ext, repetition_ext, one_up
 from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group
@@ -57,6 +58,31 @@ def base_layer(step, base, l_, offset):
   return lv3
 
 
+def base_layer_with_offset(offset_, step_, base_, l_):
+  assert offset_ < step_
+
+  step_split = numberToBase(step_, base_)
+  n_layers = len(step_split)
+  print("n_layers", n_layers)
+
+  offset_split = to_size(numberToBase(offset_, base_), n_layers)
+
+  lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base_, l_)
+  if n_layers == 1:
+    return lv_prev
+
+
+  for i in range(2, n_layers):
+    print("this loop")
+    lv_next = next_step(offset_split[-i:], step_split[-i:], lv_prev, base_, l_)
+    lv_prev = lv_next
+
+
+  print_graph(l_)
+  return last_layer(offset_split, step_split, lv_prev, base_, l_)
+
+
+
 
 def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node]]:
   BASE = base
@@ -74,6 +100,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # Generate a tree with only the start number
   if stop - start <= step:
+    print("todo")
     curr_node = ()
     # if step_order >= order(start, base):  # create only one node with digit of order(step)
     #   curr_node = Node({start: ()}, l)
@@ -96,6 +123,8 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   last_number_split = numberToBase(last_number, base)
 
   start_split = to_size(start_split_1, len(last_number_split))
+  print("start number", start_split)
+  print("last_number ", last_number_split)
 
   offset = start%step
 
@@ -103,6 +132,8 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   start_split_, last_number_split_, to_add = strip_equal_start(start_split, last_number_split)
 
+  print(to_add, start_split_)
+  print(to_add, last_number_split_)
 
   # calculate the number of nodes in each layer, which is not the lowest or highest layer
   size_intermediate_layers = number_of_nodes_per_layer(start_split_, last_number_split_, step, base)
@@ -138,7 +169,33 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # in the case there will only be one layer (only leaf nodes)
   if len(last_number_split_) == (order(step, base) + 1):
-    curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
+    step_split = numberToBase(step, base)
+    n_layers = len(step_split)
+    print("n_layers", n_layers)
+
+    offset_split = to_size(numberToBase(offset, base), n_layers)
+
+
+    if n_layers == 1:
+      curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
+
+    else:
+      lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base, l)
+      print_graph(l)
+
+      for i in range(2, n_layers - 1):
+        lv_next = next_step(offset_split[-i:], step_split[-i:], lv_prev, base, l)
+        lv_prev = lv_next
+
+
+      lv_prev_it = iter(cycle(lv_prev))
+      skip_elements(lv_prev_it, pat_start_idx)
+      partial_pat = islice(lv_prev_it, pat_stop_idx + 1)
+      pat_ = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat[pat_start_idx:pat_stop_idx + 1]]
+
+      curr_node = Node(dict(zip(pat_, partial_pat)), l)
+
+    # curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
     to_add.reverse()
     for e in to_add:
       curr_node = Node({e: curr_node}, l)
@@ -151,7 +208,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       lv1.append(Node(dict(zip(islice(pat_it, tk), repeat(()))), l))
 
   else:
-    lv1 = base_layer(step, base, l, offset)
+    lv1 = base_layer_with_offset(offset, step, base, l)
 
   lv_prev = lv1
   print("len lv1", len(lv1))
@@ -159,11 +216,15 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   # extra start node
   curr_start_node = None
   curr_start_idx = - (order(step, base) + 2)
+  print(separate_start_group, separate_stop_group)
 
   if separate_start_group:
     last_idx_start_group = pat_start_idx + r1_[start_group] - (start_idx + 1)
-    lv1_start_node = Node(dict(zip(pat[pat_start_idx:last_idx_start_group + 1], repeat(()))), l)
+    # lv1_start_node = Node(dict(zip(pat[pat_start_idx:last_idx_start_group + 1], repeat(()))), l)
+    node_to_copy = lv1[start_group]
+    part_of_pat = [to_size(numberToBase(p, base), (order(step, base) + 1))[-(order(step, base) + 1)] for p in pat[pat_start_idx:last_idx_start_group + 1]]
 
+    lv1_start_node = Node({p: node_to_copy.cd[p] for p in part_of_pat}, l)
     curr_start_node = lv1_start_node
 
   # extra stop node
@@ -171,10 +232,16 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   if separate_stop_group:
     first_idx_stop_group = pat_stop_idx - stop_idx
-    lv1_stop_node = Node(dict(zip(pat[first_idx_stop_group:pat_stop_idx + 1], repeat(()))), l)
+    # lv1_stop_node = Node(dict(zip(pat[first_idx_stop_group:pat_stop_idx + 1], repeat(()))), l)
+
+    node_to_copy = lv1[stop_group]
+    part_of_pat = [to_size(numberToBase(p, base), (order(step, base) + 1))[-(order(step, base) + 1)] for p in pat[first_idx_stop_group:pat_stop_idx + 1]]
+
+    lv1_stop_node = Node({p: node_to_copy.cd[p] for p in part_of_pat}, l)
 
     curr_stop_node = lv1_stop_node
 
+  print_graph(l)
 
   # intermediate layers
 
@@ -274,7 +341,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (0, 1000, 20, 10)
+  start, stop, step, base = (94210, 94283, 24, 2)
 
 
   rn, l = crange(start, stop, step, base)
