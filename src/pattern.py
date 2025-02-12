@@ -1,4 +1,4 @@
-from itertools import groupby, cycle, islice
+from itertools import groupby, cycle, islice, takewhile
 from math import lcm
 
 from src.base_calc import numberToBase
@@ -30,6 +30,9 @@ def pattern(n, offset, base):
     # assert offset < n
     assert n < base
 
+    # instead of using lcm, one can use as stop criterion that the first generated number is reached again
+    # following code is also correct and tested
+    # return [offset] + list(takewhile(lambda x: x != offset, ((k + offset)%base for k in range(n, n*base, n))))
     return [(k + offset) % base for k in range(0, lcm(base, n), n)]
 
 def pattern_ext(n, offset, base):
