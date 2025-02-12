@@ -21,6 +21,7 @@ def skip_elements(iterator, count):
 
 
 def base_layer(step, base, l_, offset):
+  # doesn't work
   step_order = order(step, base)
   step_split = numberToBase(step, base)
   offset_split = numberToBase(offset, base)
