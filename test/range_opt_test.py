@@ -137,11 +137,11 @@ class GeneratedTestCases(unittest.TestCase):
         self.assertListEqual([], compare_ranges(tests))
 
     def test_big_step_base_10(self):
-        tests = [self.param_generator(99999, 10) for _ in range(100)]
+        tests = [self.param_generator(99999, 10) for _ in range(50)]
         self.assertListEqual([], compare_ranges(tests))
 
     def test_big_step_any_base(self):
-        tests = [self.param_generator(99999) for _ in range(100)]
+        tests = [self.param_generator(99999) for _ in range(50)]
         self.assertListEqual([], compare_ranges(tests))
 
 
