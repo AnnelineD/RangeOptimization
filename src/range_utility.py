@@ -1,6 +1,11 @@
+from collections import deque
+from itertools import islice
 from math import gcd
 
 from src.base_calc import order
+
+def skip_elements(iterator, count):
+  deque(islice(iterator, count), maxlen=0)
 
 
 def find_last_number_of_range(start, stop, step):

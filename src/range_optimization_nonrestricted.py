@@ -3,11 +3,11 @@ from itertools import repeat, cycle, islice
 from math import gcd, lcm
 
 from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
-from src.leaf_extension import make_leaf_nodes, next_step, last_layer
+from src.leaf_extension import make_leaf_nodes, next_step, last_layer, make_leaf_nodes2, next_step2, last_layer2
 from src.node import Node
 from src.pattern import minimal_seq, pattern_ext, repetition_ext, one_up
-from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group
-
+from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group, \
+  skip_elements
 
 
 def nth(it, n):
@@ -16,12 +16,9 @@ def nth(it, n):
     return x
 
 
-def skip_elements(iterator, count):
-  deque(islice(iterator, count), maxlen=0)
-
-
 def base_layer(step, base, l_, offset):
-  # doesn't work
+  # doesn't work!!!!
+
   step_order = order(step, base)
   step_split = numberToBase(step, base)
   offset_split = numberToBase(offset, base)
@@ -67,14 +64,35 @@ def base_layer_with_offset(offset_, step_, base_, l_):
   offset_split = to_size(numberToBase(offset_, base_), n_layers)
 
   lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base_, l_)
-  if n_layers == 1:
-    return lv_prev
+
+  assert n_layers > 1  # This case is already handled in the crange method before calling this method, so this should never occur
 
   for i in range(2, n_layers):
     lv_prev = next_step(offset_split[-i:], step_split[-i:], lv_prev, base_, l_)
 
   return last_layer(offset_split, step_split, lv_prev, base_, l_)
 
+
+def base_layer_with_offset2(start_, step_, stop_, base_, l_, start_idx, stop_idx, n_steps):
+  # assert offset_ < step_
+
+  n_steps = int(n_steps)
+  step_split = numberToBase(step_, base_)
+  n_layers = len(step_split)
+
+  stop_split = numberToBase(stop_, base_)
+  start_split = to_size(numberToBase(start_, base_), n_layers)
+
+  lv_prev = make_leaf_nodes2(start_split[-1], step_split[-1], base_, l_, start_idx, stop_idx, n_steps)
+
+  assert n_layers > 1  # This case is already handled in the crange method before calling this method, so this should never occur
+
+  for i in range(2, n_layers):
+    lv_prev = next_step2(start_split[-i:], step_split[-i:], lv_prev, base_, l_, start_idx, stop_idx, n_steps)
+
+  last = last_layer2(start_split, step_split, stop_split, lv_prev, base_, l_, start_idx, stop_idx, n_steps)
+
+  return last
 
 
 
@@ -137,26 +155,55 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
 
   # in the case there will only be one layer (only leaf nodes)
   if len(last_number_split_) == (order(step, base) + 1):
-    step_split = numberToBase(step, base)
-    n_layers = len(step_split)
+    n_paths = int((last_number - start) / step) + 1
+    if n_paths < len(pat):
+      print("special 1")
+      step_split = numberToBase(step, base)
+      n_layers = len(step_split)
 
-    offset_split = to_size(numberToBase(offset, base), n_layers)
+      start_split = to_size(numberToBase(start, base), n_layers)
 
-    if n_layers == 1:
-      curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
+      if n_layers == 1:
+        print("special 1 1")
+        curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
+
+      else:
+        lv_prev = make_leaf_nodes2(start_split[-1], step_split[-1], base, l, None, None, n_paths)
+
+        for i in range(2, n_layers):
+          lv_prev = next_step2(start_split[-i:], step_split[-i:], lv_prev, base, l, None, None, n_paths)
+
+        lv_prev_it = iter(cycle(lv_prev))
+        # skip_elements(lv_prev_it, pat_start_idx)
+        partial_pat = islice(lv_prev_it, pat_stop_idx + 1)
+        assert (pat_start_idx <= pat_stop_idx)
+        pat_ = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat[pat_start_idx:pat_stop_idx + 1]]
+
+        curr_node = Node(dict(zip(pat_, partial_pat)), l)
 
     else:
-      lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base, l)
+      print("special 2")
+      step_split = numberToBase(step, base)
+      n_layers = len(step_split)
 
-      for i in range(2, n_layers):
-        lv_prev = next_step(offset_split[-i:], step_split[-i:], lv_prev, base, l)
+      offset_split = to_size(numberToBase(offset, base), n_layers)
 
-      lv_prev_it = iter(cycle(lv_prev))
-      skip_elements(lv_prev_it, pat_start_idx)
-      partial_pat = islice(lv_prev_it, pat_stop_idx + 1)
-      pat_ = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat[pat_start_idx:pat_stop_idx + 1]]
+      if n_layers == 1:
+        curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
 
-      curr_node = Node(dict(zip(pat_, partial_pat)), l)
+      else:
+        lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base, l)
+
+        for i in range(2, n_layers):
+          lv_prev = next_step(offset_split[-i:], step_split[-i:], lv_prev, base, l)
+
+        lv_prev_it = iter(cycle(lv_prev))
+        skip_elements(lv_prev_it, pat_start_idx)
+        partial_pat = islice(lv_prev_it, pat_stop_idx + 1)
+        assert(pat_start_idx <= pat_stop_idx)
+        pat_ = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat[pat_start_idx:pat_stop_idx + 1]]
+
+        curr_node = Node(dict(zip(pat_, partial_pat)), l)
 
     to_add.reverse()
     for e in to_add:
@@ -165,14 +212,27 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     return curr_node, l
 
   # make leaf layer
-  pat_it = iter(cycle(pat))
 
   if order(step, base) == 0:
+    pat_it = iter(cycle(pat))
     lv1 = [Node(dict(zip(islice(pat_it, tk), repeat(()))), l) for tk in r1]
 
   else:
-    lv1 = base_layer_with_offset(offset, step, base, l)
+    n_paths = (last_number - start)/step + 1
+    if n_paths < len(pat):
+      print("this case")
+      small_range = True
+      # print("start idx", pat_start_idx, pat_stop_idx)
+      lv1 = base_layer_with_offset2(start, step, last_number, base, l, pat_start_idx, pat_stop_idx, n_paths)
+      separate_start_group = separate_stop_group = False
 
+
+      start_group = 0
+      stop_group = len(lv1) - 1
+
+    else:
+      small_range = False
+      lv1 = base_layer_with_offset(offset, step, base, l)
   lv_prev = lv1
 
   # extra start node
@@ -244,7 +304,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
       if peek_node == first_node:
         break
 
-    if next_eq_stop_node is None:
+    if next_eq_stop_node is None and not small_range:
       # This should never occur
       raise NotImplementedError("Unexpected condition: next_eq_stop_node should not be None.")
 
@@ -301,7 +361,7 @@ def print_graph(l):
 
 
 if __name__ == '__main__':
-  start, stop, step, base = (81050, 90985, 3374, 10)
+  start, stop, step, base = (47, 91, 15, 10)
 
 
   rn, l = crange(start, stop, step, base)
