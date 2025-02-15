@@ -3,23 +3,14 @@ from itertools import cycle, islice, takewhile, accumulate
 from src.base_calc import to_number, to_size, numberToBase
 from src.node import Node
 from src.pattern import pattern, repetition_offset
-from src.range_utility import skip_elements, find_group
 
 
-def make_leaf_nodes(start, step, base, l):
+def make_leaf_nodes(start, step, base, l, n_steps = None):
   assert start < base
   assert step < base
 
   pat = pattern(step, start, base)
-  return [Node({p: ()}, l) for p in pat]
-
-def make_leaf_nodes2(start, step, base, l, start_idx, stop_idx, n_steps):
-  # assert start < base
-  assert step < base
-  pat = pattern(step, start, base)
-  empty_start = []
-
-  if len(pat) > n_steps:
+  if n_steps and len(pat) > n_steps:
       pat = pat[:n_steps]
 
   return [Node({p: ()}, l) for p in pat]
