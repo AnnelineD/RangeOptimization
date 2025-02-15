@@ -3,7 +3,7 @@ from itertools import repeat, cycle, islice
 from math import gcd, lcm
 
 from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
-from src.leaf_extension import make_leaf_nodes, next_step, last_layer, next_step2, last_layer2
+from src.leaf_extension import make_leaf_nodes, next_step, last_layer, last_layer2
 from src.node import Node
 from src.pattern import minimal_seq, pattern_ext, repetition_ext, one_up
 from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group, \
@@ -88,7 +88,7 @@ def base_layer_with_offset2(start_, step_, stop_, base_, l_, start_idx, stop_idx
   assert n_layers > 1  # This case is already handled in the crange method before calling this method, so this should never occur
 
   for i in range(2, n_layers):
-    lv_prev = next_step2(start_split[-i:], step_split[-i:], lv_prev, base_, l_, start_idx, stop_idx, n_steps)
+    lv_prev = next_step(start_split[-i:], step_split[-i:], lv_prev, base_, l_, n_steps)
 
   last = last_layer2(start_split, step_split, stop_split, lv_prev, base_, l_, start_idx, stop_idx, n_steps)
 
@@ -171,7 +171,7 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
         lv_prev = make_leaf_nodes(start_split[-1], step_split[-1], base, l, n_paths)
 
         for i in range(2, n_layers):
-          lv_prev = next_step2(start_split[-i:], step_split[-i:], lv_prev, base, l, None, None, n_paths)
+          lv_prev = next_step(start_split[-i:], step_split[-i:], lv_prev, base, l, n_paths)
 
         lv_prev_it = iter(cycle(lv_prev))
         # skip_elements(lv_prev_it, pat_start_idx)

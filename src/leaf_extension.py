@@ -16,7 +16,7 @@ def make_leaf_nodes(start, step, base, l, n_steps = None):
   return [Node({p: ()}, l) for p in pat]
 
 
-def next_step(start_split, step_split, prev_nodes, base, l):
+def next_step(start_split, step_split, prev_nodes, base, l, n_steps = None):
   prev_step = to_number(step_split[1:], base)
 
   if prev_step == 0:
@@ -25,36 +25,11 @@ def next_step(start_split, step_split, prev_nodes, base, l):
     pat_full = pattern(to_number(step_split, base), to_number(start_split, base), base**len(step_split))
     pat = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat_full]
 
-  lv_prev_it = iter(cycle(prev_nodes))
-  return [Node({p: next(lv_prev_it)}, l) for p in pat]
-
-
-def next_step2(start_split, step_split, prev_nodes, base, l, start_idx, stop_idx, n_steps):
-  prev_step = to_number(step_split[1:], base)
-
-  if prev_step == 0:
-    pat = pattern(step_split[0], start_split[0], base)
-  else:
-    pat_full = pattern(to_number(step_split, base), to_number(start_split, base), base**len(step_split))
-    pat = [to_size(numberToBase(i, base), len(step_split))[0] for i in pat_full]
-
-  if len(pat) > n_steps:
-      pat = pat[:n_steps]
-
-  empty_start = []
-  # if len(pat) > n_steps:
-  #     if start_idx < stop_idx:
-  #         pat = pat[start_idx:(stop_idx + 1)]
-  #     if stop_idx < start_idx:
-  #         pat = pat[start_idx:] + pat[:(stop_idx + 1)]
-  #     empty_start = [None]*start_idx
-
-  # print("pat 2", pat)
+  if n_steps and len(pat) > n_steps:
+    pat = pat[:n_steps]
 
   lv_prev_it = iter(cycle(prev_nodes))
-  # skip_elements(lv_prev_it, start_idx)
   return [Node({p: next(lv_prev_it)}, l) for p in pat]
-
 
 
 def last_layer(start_split, step_split, prev_nodes, base, l):
