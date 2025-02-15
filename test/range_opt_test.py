@@ -2,7 +2,7 @@ import unittest
 from random import randint
 
 from src.base_calc import order, to_number
-from src.range_optimization_nonrestricted import crange, to_number_special
+from src.range_optimization_nonrestricted import crange
 
 
 def compare_range(start, stop, step, base) -> bool:

@@ -2,8 +2,8 @@ from collections import deque
 from itertools import repeat, cycle, islice
 from math import gcd, lcm
 
-from src.base_calc import numberToBase, order, to_number, to_size, to_number_special
-from src.leaf_extension import make_leaf_nodes, next_step, last_layer, last_layer2
+from src.base_calc import numberToBase, order, to_number, to_size
+from src.leaf_extension import make_leaf_nodes, next_step, last_layer
 from src.node import Node
 from src.pattern import minimal_seq, pattern_ext, repetition_ext, one_up
 from src.range_utility import find_last_number_of_range, strip_equal_start, number_of_nodes_per_layer, find_group, \
@@ -90,7 +90,7 @@ def base_layer_with_offset2(start_, step_, stop_, base_, l_, start_idx, stop_idx
   for i in range(2, n_layers):
     lv_prev = next_step(start_split[-i:], step_split[-i:], lv_prev, base_, l_, n_steps)
 
-  last = last_layer2(start_split, step_split, stop_split, lv_prev, base_, l_, start_idx, stop_idx, n_steps)
+  last = last_layer(start_split, step_split, lv_prev, base_, l_, n_steps)
 
   return last
 
@@ -157,14 +157,12 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   if len(last_number_split_) == (order(step, base) + 1):
     n_paths = int((last_number - start) / step) + 1
     if n_paths < len(pat):
-      print("special 1")
       step_split = numberToBase(step, base)
       n_layers = len(step_split)
 
       start_split = to_size(numberToBase(start, base), n_layers)
 
       if n_layers == 1:
-        print("special 1 1")
         curr_node = Node(dict(zip(pat[pat_start_idx:pat_stop_idx + 1], repeat(()))), l)
 
       else:
@@ -182,7 +180,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
         curr_node = Node(dict(zip(pat_, partial_pat)), l)
 
     else:
-      print("special 2")
       step_split = numberToBase(step, base)
       n_layers = len(step_split)
 
@@ -220,7 +217,6 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
   else:
     n_paths = (last_number - start)/step + 1
     if n_paths < len(pat):
-      print("this case")
       small_range = True
       # print("start idx", pat_start_idx, pat_stop_idx)
       lv1 = base_layer_with_offset2(start, step, last_number, base, l, pat_start_idx, pat_stop_idx, n_paths)
