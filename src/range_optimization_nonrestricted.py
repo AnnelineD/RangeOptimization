@@ -55,45 +55,22 @@ def base_layer(step, base, l_, offset):
   return lv3
 
 
-def base_layer_with_offset(offset_, step_, base_, l_):
-  assert offset_ < step_
+def base_layer_with_offset(offset_, step_, base_, l_, n_steps = None):
+  # assert offset_ < step_ # not always in small range case (because we use start instead of offset)
 
   step_split = numberToBase(step_, base_)
   n_layers = len(step_split)
 
   offset_split = to_size(numberToBase(offset_, base_), n_layers)
 
-  lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base_, l_)
+  lv_prev = make_leaf_nodes(offset_split[-1], step_split[-1], base_, l_, n_steps)
 
   assert n_layers > 1  # This case is already handled in the crange method before calling this method, so this should never occur
 
   for i in range(2, n_layers):
-    lv_prev = next_step(offset_split[-i:], step_split[-i:], lv_prev, base_, l_)
+    lv_prev = next_step(offset_split[-i:], step_split[-i:], lv_prev, base_, l_, n_steps)
 
-  return last_layer(offset_split, step_split, lv_prev, base_, l_)
-
-
-def base_layer_with_offset2(start_, step_, stop_, base_, l_, start_idx, stop_idx, n_steps):
-  # assert offset_ < step_
-
-  n_steps = int(n_steps)
-  step_split = numberToBase(step_, base_)
-  n_layers = len(step_split)
-
-  stop_split = numberToBase(stop_, base_)
-  start_split = to_size(numberToBase(start_, base_), n_layers)
-
-  lv_prev = make_leaf_nodes(start_split[-1], step_split[-1], base_, l_, n_steps)
-
-  assert n_layers > 1  # This case is already handled in the crange method before calling this method, so this should never occur
-
-  for i in range(2, n_layers):
-    lv_prev = next_step(start_split[-i:], step_split[-i:], lv_prev, base_, l_, n_steps)
-
-  last = last_layer(start_split, step_split, lv_prev, base_, l_, n_steps)
-
-  return last
-
+  return last_layer(offset_split, step_split, lv_prev, base_, l_, n_steps)
 
 
 def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node]]:
@@ -215,11 +192,11 @@ def crange(start: int, stop: int, step: int, base: int) -> tuple[Node, list[Node
     lv1 = [Node(dict(zip(islice(pat_it, tk), repeat(()))), l) for tk in r1]
 
   else:
-    n_paths = (last_number - start)/step + 1
+    n_paths = int((last_number - start)/step) + 1
     if n_paths < len(pat):
       small_range = True
       # print("start idx", pat_start_idx, pat_stop_idx)
-      lv1 = base_layer_with_offset2(start, step, last_number, base, l, pat_start_idx, pat_stop_idx, n_paths)
+      lv1 = base_layer_with_offset(start, step, base, l, n_paths)
       separate_start_group = separate_stop_group = False
 
 
